@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PriceIQ — Competitor Intelligence Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090f;--s:#0e1119;--c:#121621;--b:#1d2235;--b2:#252b3d;--a:#00ff88;--a2:#ff6b35;--a3:#4d9fff;--w:#ffd166;--d:#ff4757;--t:#e2e8f0;--m:#64748b;--m2:#8892a4;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--t);font-family:'Manrope',sans-serif;font-size:14px;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.01) 2px,rgba(0,255,136,.01) 4px);pointer-events:none;z-index:9999;}
+.sb{position:fixed;top:0;left:0;bottom:0;width:210px;background:var(--s);border-right:1px solid var(--b);display:flex;flex-direction:column;z-index:100;}
+.sbl{padding:24px 22px 18px;border-bottom:1px solid var(--b);}
+.brand{font-family:'Bebas Neue';font-size:26px;letter-spacing:3px;}
+.bsub{font-family:'IBM Plex Mono';font-size:9px;color:var(--a);letter-spacing:2px;margin-top:3px;}
+.snav{flex:1;padding:12px 0;overflow-y:auto;}
+.ns{font-family:'IBM Plex Mono';font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--m);padding:12px 22px 5px;}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 22px;font-size:13px;font-weight:500;color:var(--m2);cursor:pointer;border-left:2px solid transparent;text-decoration:none;transition:all .2s;}
+.ni:hover{color:var(--t);background:rgba(255,255,255,.03);}
+.ni.active{color:var(--a);border-left-color:var(--a);background:rgba(0,255,136,.05);}
+.sf{padding:16px 22px;border-top:1px solid var(--b);font-family:'IBM Plex Mono';font-size:10px;color:var(--m);}
+.dot{display:inline-block;width:7px;height:7px;background:var(--a);border-radius:50%;margin-right:5px;animation:bl 2s ease-in-out infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.mn{margin-left:210px;min-height:100vh;}
+.tb{background:var(--s);border-bottom:1px solid var(--b);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tbt{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--m2);}
+.tbt span{color:var(--t);font-weight:600;}
+.tbr{display:flex;align-items:center;gap:14px;}
+.lu{font-family:'IBM Plex Mono';font-size:10px;color:var(--m);}
+.rb{padding:6px 14px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);border-radius:6px;color:var(--a);font-family:'IBM Plex Mono';font-size:11px;cursor:pointer;transition:all .2s;}
+.rb:hover{background:rgba(0,255,136,.2);}
+.ct{padding:22px 28px;}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px;}
+.kc{background:var(--c);border:1px solid var(--b);border-radius:11px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .2s;}
+.kc:hover{transform:translateY(-1px);}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kc.g::before{background:var(--a);}.kc.o::before{background:var(--a2);}.kc.bl::before{background:var(--a3);}.kc.y::before{background:var(--w);}
+.kl{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:9px;}
+.kv{font-family:'Bebas Neue';font-size:48px;line-height:1;margin-bottom:3px;}
+.kc.g .kv{color:var(--a);}.kc.o .kv{color:var(--a2);}.kc.bl .kv{color:var(--a3);}.kc.y .kv{color:var(--w);}
+.ks{font-size:11px;color:var(--m);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;}
+.pn2{background:var(--c);border:1px solid var(--b);border-radius:11px;overflow:hidden;}
+.ph{padding:14px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;}
+.pt{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--t);display:flex;align-items:center;gap:8px;}
+.pt::before{content:'';display:block;width:6px;height:6px;background:var(--a);border-radius:50%;}
+.badge{font-family:'IBM Plex Mono';font-size:10px;padding:3px 9px;border-radius:100px;}
+.bg{background:rgba(0,255,136,.1);color:var(--a);border:1px solid rgba(0,255,136,.2);}
+.bo{background:rgba(255,107,53,.1);color:var(--a2);border:1px solid rgba(255,107,53,.2);}
+.pb{padding:16px 20px;}
+.al{display:flex;flex-direction:column;gap:7px;}
+.ai{display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(255,71,87,.05);border:1px solid rgba(255,71,87,.12);border-radius:7px;}
+.aa{color:var(--d);font-size:15px;font-weight:700;flex-shrink:0;}
+.ap{font-weight:600;color:var(--t);font-size:12px;line-height:1.3;}
+.as2{color:var(--m2);font-size:10px;}
+.ac{font-family:'IBM Plex Mono';color:var(--d);font-weight:600;font-size:11px;}
+.apr{font-family:'IBM Plex Mono';color:var(--a);font-size:10px;}
+table{width:100%;border-collapse:collapse;}
+th{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);padding:10px 14px;text-align:left;border-bottom:1px solid var(--b);white-space:nowrap;}
+td{padding:9px 14px;font-size:13px;border-bottom:1px solid rgba(29,34,53,.4);white-space:nowrap;}
+tr:hover td{background:rgba(255,255,255,.018);}
+.pn{font-weight:600;color:var(--t);max-width:150px;overflow:hidden;text-overflow:ellipsis;}
+.cb{font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(77,159,255,.1);color:var(--a3);border:1px solid rgba(77,159,255,.2);}
+.pc{color:var(--a);font-weight:700;font-family:'IBM Plex Mono';}
+.pe{color:var(--d);font-family:'IBM Plex Mono';}
+.ts{overflow-x:auto;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+@media(max-width:900px){.kg{grid-template-columns:1fr 1fr;}.g2,.g31{grid-template-columns:1fr;}.sb{width:50px;}.mn{margin-left:50px;}.bsub,.ns,.ni span:last-child,.sf div{display:none;}}
+</style></head>
+<body>
+<nav class="sb">
+  <div class="sbl"><div class="brand">PriceIQ</div><div class="bsub">// Intel Engine</div></div>
+  <div class="snav">
+    <div class="ns">Monitor</div>
+    <a class="ni active" href="#"><span>◼</span><span>Overview</span></a>
+    <a class="ni" href="#"><span>📈</span><span>Trends</span></a>
+    <a class="ni" href="#"><span>🔔</span><span>Alerts</span></a>
+    <div class="ns">Analyse</div>
+    <a class="ni" href="#"><span>🏪</span><span>Competitors</span></a>
+    <a class="ni" href="#"><span>📦</span><span>Products</span></a>
+    <a class="ni" href="#"><span>📊</span><span>Categories</span></a>
+    <div class="ns">System</div>
+    <a class="ni" href="#"><span>⚙️</span><span>Scraper Config</span></a>
+    <a class="ni" href="#"><span>📥</span><span>Export CSV</span></a>
+  </div>
+  <div class="sf"><div><span class="dot"></span>LIVE · 15m</div><div style="margin-top:4px">v1.0 · 5 sources</div></div>
+</nav>
+<div class="mn">
+  <div class="tb">
+    <div class="tbt">Dashboard / <span>Price Intelligence Overview</span></div>
+    <div class="tbr"><div class="lu">Updated: <span id="ts">--</span></div><button class="rb" onclick="uts()">⟳ REFRESH</button></div>
+  </div>
+  <div class="ct">
+    <div class="kg">
+      <div class="kc g"><div class="kl">SKUs Tracked</div><div class="kv">35</div><div class="ks">across 5 competitor sites</div></div>
+      <div class="kc bl"><div class="kl">Sites Monitored</div><div class="kv">5</div><div class="ks">scraped every 15 minutes</div></div>
+      <div class="kc o"><div class="kl">Price Changes</div><div class="kv">1117</div><div class="ks">detected last 14 days</div></div>
+      <div class="kc y"><div class="kl">Price Drops</div><div class="kv">560</div><div class="ks">competitor reductions</div></div>
+    </div>
+    <div class="g31">
+      <div class="pn2">
+        <div class="ph"><div class="pt">iPhone 15 Pro — 14-Day Price Trend (All Competitors)</div><span class="badge bg">LIVE</span></div>
+        <div class="pb"><div style="position:relative;height:240px"><canvas id="tc"></canvas></div></div>
+      </div>
+      <div class="pn2">
+        <div class="ph"><div class="pt">Price Drop Alerts</div><span class="badge bo">560 drops</span></div>
+        <div class="pb" style="padding:12px"><div class="al"><div class="ai"><div class="aa">▼</div><div><div class="ap">Belkin MagSafe</div><div class="as2">TechMart</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.99 off</div><div class="apr">£31</div></div></div><div class="ai"><div class="aa">▼</div><div><div class="ap">Anker 65W Charger</div><div class="as2">GadgetHub</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.96 off</div><div class="apr">£49</div></div></div><div class="ai"><div class="aa">▼</div><div><div class="ap">Sony Xperia 1 VI</div><div class="as2">MegaStore</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.96 off</div><div class="apr">£601</div></div></div><div class="ai"><div class="aa">▼</div><div><div class="ap">Canon EOS R6</div><div class="as2">PriceKing</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.95 off</div><div class="apr">£926</div></div></div><div class="ai"><div class="aa">▼</div><div><div class="ap">Nothing Phone 2</div><div class="as2">ShopZone</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.94 off</div><div class="apr">£521</div></div></div><div class="ai"><div class="aa">▼</div><div><div class="ap">Belkin MagSafe</div><div class="as2">PriceKing</div></div><div style="margin-left:auto;text-align:right"><div class="ac">£14.93 off</div><div class="apr">£42</div></div></div></div></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="pn2">
+        <div class="ph"><div class="pt">Avg Price by Category & Competitor</div></div>
+        <div class="pb"><div style="position:relative;height:265px"><canvas id="cc"></canvas></div></div>
+      </div>
+      <div class="pn2">
+        <div class="ph"><div class="pt">Competitor Price Radar</div></div>
+        <div class="pb"><div style="position:relative;height:265px"><canvas id="rc"></canvas></div></div>
+      </div>
+    </div>
+    <div class="pn2">
+      <div class="ph"><div class="pt">Live Price Comparison — 🟢 Cheapest · 🔴 Most Expensive</div><span class="badge bg">10 products</span></div>
+      <div class="ts"><table><thead><tr><th>Product</th><th>Category</th><th>TechMart</th><th>GadgetHub</th><th>ShopZone</th><th>PriceKing</th><th>MegaStore</th></tr></thead><tbody><tr><td class="pn" title="Samsung Tab S9">Samsung Tab S9</td><td><span class="cb">Tablets</span></td><td>£417</td><td class="pe">£478</td><td class="pc">£280</td><td class="pc">£280</td><td>£297</td></tr><tr><td class="pn" title="MacBook Pro 14">MacBook Pro 14</td><td><span class="cb">Laptops</span></td><td class="pe">£567</td><td class="pc">£490</td><td class="pc">£490</td><td class="pc">£490</td><td class="pc">£490</td></tr><tr><td class="pn" title="Lenovo ThinkPad X1">Lenovo ThinkPad X1</td><td><span class="cb">Laptops</span></td><td>£815</td><td class="pe">£885</td><td>£736</td><td>£575</td><td class="pc">£490</td></tr><tr><td class="pn" title="iPhone 15 Pro">iPhone 15 Pro</td><td><span class="cb">Smartphones</span></td><td class="pe">£739</td><td class="pc">£350</td><td>£367</td><td class="pc">£350</td><td class="pc">£350</td></tr><tr><td class="pn" title="Sony A7 IV">Sony A7 IV</td><td><span class="cb">Cameras</span></td><td>£1355</td><td>£1540</td><td class="pe">£1958</td><td class="pc">£840</td><td>£1153</td></tr><tr><td class="pn" title="Nikon Z6 III">Nikon Z6 III</td><td><span class="cb">Cameras</span></td><td class="pc">£905</td><td>£1080</td><td>£1777</td><td>£1077</td><td class="pe">£1838</td></tr><tr><td class="pn" title="Dell XPS 15">Dell XPS 15</td><td><span class="cb">Laptops</span></td><td class="pc">£490</td><td class="pc">£490</td><td class="pc">£490</td><td class="pe">£759</td><td class="pc">£490</td></tr><tr><td class="pn" title="Acer Swift 5">Acer Swift 5</td><td><span class="cb">Laptops</span></td><td class="pc">£490</td><td>£889</td><td>£669</td><td class="pe">£1041</td><td>£934</td></tr><tr><td class="pn" title="Nothing Phone 2">Nothing Phone 2</td><td><span class="cb">Smartphones</span></td><td class="pe">£774</td><td>£420</td><td class="pc">£350</td><td>£449</td><td>£367</td></tr><tr><td class="pn" title="Apple AirPods Max">Apple AirPods Max</td><td><span class="cb">Headphones</span></td><td>£147</td><td>£112</td><td class="pc">£105</td><td class="pe">£213</td><td class="pc">£105</td></tr></tbody></table></div>
+    </div>
+  </div>
+</div>
+<script>
+function uts(){document.getElementById('ts').textContent=new Date().toLocaleTimeString();} uts();
+Chart.defaults.color='#64748b';Chart.defaults.borderColor='#1d2235';Chart.defaults.font.family="'IBM Plex Mono',monospace";Chart.defaults.font.size=11;
+const tt={backgroundColor:'#121621',borderColor:'#1d2235',borderWidth:1,titleColor:'#e2e8f0',bodyColor:'#8892a4',padding:10};
+new Chart(document.getElementById('tc'),{type:'line',data:{labels:["2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-05-30", "2026-05-31", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-06", "2026-06-07", "2026-06-08"],datasets:[{"label": "TechMart", "data": [498.49, 486.05, 474.34, 494.81, 533.17, 527.62, 366.1, 524.56, 686.54, 350.0, 350.0, 350.0, 350.0, 739.36], "borderColor": "#00ff88", "backgroundColor": "#00ff8818", "tension": 0.4, "borderWidth": 2, "pointRadius": 2, "fill": false}, {"label": "GadgetHub", "data": [486.02, 471.21, 483.48, 469.3, 420.89, 519.25, 438.6, 353.51, 449.86, 658.24, 669.25, 364.2, 350.0, 350.0], "borderColor": "#4d9fff", "backgroundColor": "#4d9fff18", "tension": 0.4, "borderWidth": 2, "pointRadius": 2, "fill": false}, {"label": "ShopZone", "data": [519.75, 503.99, 489.47, 437.1, 569.38, 632.66, 396.05, 491.16, 478.87, 594.55, 761.29, 690.15, 350.0, 367.11], "borderColor": "#ff6b35", "backgroundColor": "#ff6b3518", "tension": 0.4, "borderWidth": 2, "pointRadius": 2, "fill": false}, {"label": "PriceKing", "data": [474.49, 463.96, 493.97, 412.68, 469.52, 548.39, 465.84, 430.36, 533.54, 376.57, 628.06, 350.0, 646.96, 350.0], "borderColor": "#ffd166", "backgroundColor": "#ffd16618", "tension": 0.4, "borderWidth": 2, "pointRadius": 2, "fill": false}, {"label": "MegaStore", "data": [509.91, 512.87, 483.38, 470.87, 459.29, 586.72, 527.61, 350.0, 381.57, 350.0, 706.85, 530.39, 479.65, 350.0], "borderColor": "#ff4757", "backgroundColor": "#ff475718", "tension": 0.4, "borderWidth": 2, "pointRadius": 2, "fill": false}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:12}},tooltip:tt},scales:{x:{grid:{color:'rgba(29,34,53,.8)'},ticks:{maxRotation:0,maxTicksLimit:7}},y:{grid:{color:'rgba(29,34,53,.8)'},ticks:{callback:v=>'£'+v}}}}});
+new Chart(document.getElementById('cc'),{type:'bar',data:{labels:["Laptops", "Smartphones", "Headphones", "Tablets", "Cameras", "Accessories"],datasets:[{"label": "TechMart", "data": [599.76, 646.03, 170.01, 421.63, 1293.4, 43.54], "backgroundColor": "#00ff8888", "borderColor": "#00ff88", "borderWidth": 1, "borderRadius": 3}, {"label": "GadgetHub", "data": [835.15, 453.57, 153.3, 485.3, 1128.53, 48.27], "backgroundColor": "#4d9fff88", "borderColor": "#4d9fff", "borderWidth": 1, "borderRadius": 3}, {"label": "ShopZone", "data": [648.84, 523.62, 168.31, 356.06, 1364.48, 42.31], "backgroundColor": "#ff6b3588", "borderColor": "#ff6b35", "borderWidth": 1, "borderRadius": 3}, {"label": "PriceKing", "data": [739.6, 415.57, 177.87, 379.36, 1330.48, 32.38], "backgroundColor": "#ffd16688", "borderColor": "#ffd166", "borderWidth": 1, "borderRadius": 3}, {"label": "MegaStore", "data": [622.13, 493.64, 156.97, 303.5, 1389.56, 32.28], "backgroundColor": "#ff475788", "borderColor": "#ff4757", "borderWidth": 1, "borderRadius": 3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10}},tooltip:tt},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(29,34,53,.8)'},ticks:{callback:v=>'£'+v}}}}});
+new Chart(document.getElementById('rc'),{type:'radar',data:{labels:["Laptops", "Smartphones", "Headphones", "Tablets", "Cameras", "Accessories"],datasets:[{"label": "TechMart", "data": [599.76, 646.03, 170.01, 421.63, 1293.4, 43.54], "borderColor": "#00ff88", "backgroundColor": "#00ff8815", "borderWidth": 2, "pointBackgroundColor": "#00ff88", "pointRadius": 3}, {"label": "GadgetHub", "data": [835.15, 453.57, 153.3, 485.3, 1128.53, 48.27], "borderColor": "#4d9fff", "backgroundColor": "#4d9fff15", "borderWidth": 2, "pointBackgroundColor": "#4d9fff", "pointRadius": 3}, {"label": "ShopZone", "data": [648.84, 523.62, 168.31, 356.06, 1364.48, 42.31], "borderColor": "#ff6b35", "backgroundColor": "#ff6b3515", "borderWidth": 2, "pointBackgroundColor": "#ff6b35", "pointRadius": 3}, {"label": "PriceKing", "data": [739.6, 415.57, 177.87, 379.36, 1330.48, 32.38], "borderColor": "#ffd166", "backgroundColor": "#ffd16615", "borderWidth": 2, "pointBackgroundColor": "#ffd166", "pointRadius": 3}, {"label": "MegaStore", "data": [622.13, 493.64, 156.97, 303.5, 1389.56, 32.28], "borderColor": "#ff4757", "backgroundColor": "#ff475715", "borderWidth": 2, "pointBackgroundColor": "#ff4757", "pointRadius": 3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:8,padding:10}},tooltip:tt},scales:{r:{grid:{color:'rgba(29,34,53,.9)'},angleLines:{color:'rgba(29,34,53,.9)'},pointLabels:{color:'#8892a4',font:{size:10}},ticks:{display:false}}}}});
+</script></body></html>
